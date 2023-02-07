@@ -1,0 +1,149 @@
+C51 COMPILER V9.60.7.0   TIME                                                              01/24/2023 16:27:57 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE TIME
+OBJECT MODULE PLACED IN .\Objects\Time.obj
+COMPILER INVOKED BY: D:\Keil\keil_main_file\C51\BIN\C51.EXE Time.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\L
+                    -istings\Time.lst) TABS(2) PREPRINT(.\Listings\Time.i) OBJECT(.\Objects\Time.obj)
+
+line level    source
+
+   1          /*
+   2              sectional  :Time.c file
+   3              part       :first part
+   4              student ID :22B103090106 宋宇航
+   5              student ID :22B103090121 田全鑫
+   6              date       :2022.12.1
+   7              Project    :Clock
+   8          */
+   9          /*********************************************************************************************************
+             -***********************************/
+  10          #include "chang_function_2.h"                                                       //include Time_sub_Fun
+             -ction.c
+  11          int count=0;
+  12          
+  13          void interrupt_time(void) interrupt 1 using 0 {   //中断程序
+  14   1          TH0=(65536-50000)/256;    //TH0赋值
+  15   1          TL0=(65536-50000)%256;    //TL0赋值
+  16   1          TF0=0;                    //TF0清零
+  17   1          count++;                  //计数按钮计数到20为一秒sum_time_1+1秒
+  18   1          if(count==20) {           //计数满20则秒数加一
+  19   2              sum_time_1++;
+  20   2              count=0;              //count清零，执行
+  21   2          }
+  22   1      
+  23   1      
+  24   1      }
+  25          //main----------------------------------------------------------------------------------------------------
+             ---------------------------------------------
+  26          void main()
+  27          {
+  28   1          int mark=0;               //上电蜂鸣器标志位
+  29   1          pm=0;
+  30   1          kk=0;                     //矩阵键盘使得第一行四个键全部上电，只用第一行四个键
+  31   1          TMOD=0X01;
+  32   1          TH0=(65536-50000)/256;
+  33   1          TL0=(65536-50000)%256;
+  34   1          ET0=1;                  //开ET0中断
+  35   1          EA=1;                   //开EA总中断
+  36   1          TR0=1;                  //启动定时器T0
+  37   1          init();                 //初始化函数
+  38   1      begin:
+  39   1          TR0=1;
+  40   1          function[0] = date_struct_change;                                               //给指针函数组�
+             -�值date_struct_change
+  41   1          function[1] = returnnumber;                                                     //给指针函数组�
+             -�值returnnumber
+  42   1      //loop fuction--------------------------------------------------------------------------------------------
+             ----------------------------------------
+  43   1          while (1) {
+  44   2              if (subtraction == 0 || add == 0 || right == 0 || left == 0) {              //如果按了加、减、�
+             -�移、右移、end按键进入设置模式
+  45   3                  TR0=0;
+  46   3                  TH0=(65536-50000)/256;
+  47   3                  TL0=(65536-50000)%256;
+C51 COMPILER V9.60.7.0   TIME                                                              01/24/2023 16:27:57 PAGE 2   
+
+  48   3                  TF0=0;
+  49   3                  shift();                                                                //调用shift函数，
+             -进入设置模式
+  50   3                  P0=0X00,P2=0X00;
+  51   3                  date_change->second   = date_change_1->second;
+  52   3                  date_change->minute   = date_change_1->minute;
+  53   3                  date_change->hour     = date_change_1->hour;
+  54   3                  date_change_1->minute = date_change->minute;
+  55   3                  date_change_1->hour   = date_change->hour;                              //赋值秒
+  56   3                  date_change_1->second = date_change->second;
+  57   3                  sum_time_1=date_change_1->second;
+  58   3                  delay(200);
+  59   3                  mark=1;
+  60   3                  goto begin;                                                             //跳转到begin
+  61   3              }
+  62   2              else if(restart==0) {                                                       //暂停启动按键
+  63   3                  delay(1);
+  64   3                  while(restart==1);
+  65   3                  delay(1);
+  66   3                  while(restart==0);
+  67   3                  TR0=~TR0;
+  68   3              }
+  69   2              else {
+  70   3                  if (sum_time_1 == 60) {                                                 //时间算法，如�
+             -�sum_time_1为60，则minute加1，对sum_time_1清零
+  71   4                      date_change->minute += 1;
+  72   4                      if ((date_change->minute) == 60) {                                  //如果date_change_1-
+             ->minute为60则date_change_1->hour加1
+  73   5                          date_change->hour += 1;
+  74   5                          if ((date_change->hour) == 24) {                                 //如果date_change_1
+             -->hour为24则date_change_1->minute与hour清零
+  75   6                              date_change->minute = 0;
+  76   6                              date_change->hour   = 0;
+  77   6                          }
+  78   5                          date_change->minute = 0;
+  79   5                      }
+  80   4                      sum_time_1 = 0;                                                    //计数寄存器清零
+  81   4                  }
+  82   3      //每8位循环显示，使得8位数码管全里亮------------------------------------------------------
+             -----------------------------------------------------------
+  83   3                  for (address = 0; address < 8; address++) {                             //循环送显
+  84   4                      format(sum_time_1);                                                 //调用格式化函�
+             -�
+  85   4                      function[0]();                                                      //调用date_struct_ch
+             -ange
+  86   4                      function[1]();                                                      //调用returnnume
+  87   4                      display(address, address);                                          //送显函数
+  88   4      // time algorithm-----------------------------------------------------------------------------------------
+             -------------------------------------------------------
+  89   4                      if ((date_change->minute) == 0&&mark==1) {                          //整点报时功能
+  90   5                          if((date_change->second)>=0&&(date_change->second)<=60) {
+  91   6                              if((date_change->second)>=0&&(date_change->second)<=3) {    //响三秒
+  92   7                                  pm=1;
+  93   7                              }
+  94   6      
+  95   6                          }
+  96   5                      }
+  97   4                      else {
+  98   5                          if((date_change->second) == 4) {                                //若未进入shift模式正常模式�
+             -��，上电后不报时，超过3秒后便可以把标志位置为位为1，我选择4秒，也可5秒，或其他
+  99   6                              mark=1;
+ 100   6                          }
+C51 COMPILER V9.60.7.0   TIME                                                              01/24/2023 16:27:57 PAGE 3   
+
+ 101   5                      }
+ 102   4                  }
+ 103   3              }
+ 104   2          }
+ 105   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1966    ----
+   CONSTANT SIZE    =     40    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     78      32
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,3 @@
+".\Objects\Time.obj" 
+TO ".\Objects\Time_Project" 
+PRINT(".\Listings\Time_Project.m51") RAMSIZE(256) 
